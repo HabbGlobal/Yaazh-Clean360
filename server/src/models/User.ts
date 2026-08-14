@@ -1,0 +1,6 @@
+import { Schema, model, Types } from "mongoose";
+export type UserRole = "resident" | "admin";
+export type AccountStatus = "active" | "suspended";
+export interface IUser { name: string; email: string; password: string; role: UserRole; emailVerified: boolean; accountStatus: AccountStatus; profileImage?: string; zoneId?: Types.ObjectId | null; }
+const schema = new Schema<IUser>({ name:{type:String,required:true,trim:true}, email:{type:String,required:true,unique:true,lowercase:true,trim:true}, password:{type:String,required:true,select:false}, role:{type:String,enum:["resident","admin"],default:"resident"}, emailVerified:{type:Boolean,default:false}, accountStatus:{type:String,enum:["active","suspended"],default:"active"}, profileImage:{type:String,default:""}, zoneId:{type:Schema.Types.ObjectId,ref:"Zone",default:null,required:function(){return this.role==="resident";}} }, { timestamps:true });
+export const User = model<IUser>("User", schema);

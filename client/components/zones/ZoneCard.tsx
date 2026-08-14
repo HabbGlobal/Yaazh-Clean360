@@ -1,0 +1,2 @@
+import type { Zone } from "@/types";
+export default function ZoneCard({ zone, onSelect, selected = false }: { zone: Zone; onSelect: (zone: Zone) => void; selected?: boolean }) { return <button type="button" className={`zone-card${selected ? " zone-card-selected" : ""}`} aria-pressed={selected} onClick={() => onSelect(zone)}><img src={zone.imageBase64} alt={`${zone.name} map`} /><span><strong>{zone.name}</strong><br /><small>{zone.description}</small><span className="lorry-number">Lorry: {zone.assignedLorry}</span></span></button>; }
