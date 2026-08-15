@@ -2,6 +2,7 @@ import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 
 import ZoneCardSpread from "@/components/landing/ZoneCardSpread";
+import SplitText from "@/components/common/SplitText";
 import yaazhLogo from "@/assets/logo yaazh.png";
 import welcomeImage from "@/assets/images/welcome.png";
 import zone1Image from "@/assets/images/Zone01-RB9593.png";
@@ -30,9 +31,6 @@ const features = [
   ["status", "Complaint status tracking", "Follow each report from submitted to in-review and resolved without calling the office repeatedly.", "mint"],
   ["star", "Service rating", "Rate collection quality after service and share feedback that helps improve future routes.", "yellow"],
   ["profile", "Resident profile control", "Keep your phone number, address, profile image and selected zone up to date from one place.", "purple"],
-  ["phone", "Tap-to-call support", "Reach Pradesa Sabha quickly from the floating help popup on mobile and desktop.", "pink"],
-  ["shield", "Secure resident access", "OTP verification, password hashing, JWT sessions and role-based access protect the platform.", "yellow"],
-  ["refresh", "Admin-managed updates", "Schedules, waste types, lorries, residents, complaints and feedback can be managed centrally.", "mint"],
 ];
 
 const pradesaSabhaPhone = "021 222 2700";
@@ -63,7 +61,7 @@ export default function Home() {
         <div className="np-container np-hero__grid">
           <div className="np-hero__copy">
             <p className="np-sticker np-sticker--yellow">Smart collection for cleaner communities</p>
-            <h1 id="hero-title">Cleaner streets, right on schedule.</h1>
+            <h1 id="hero-title"><SplitText tag="span" text={"Cleaner\u00A0"} className="np-hero-cleaner" delay={200} duration={0.9} ease="power3.out" splitType="chars" from={{ opacity: 0, y: 60 }} to={{ opacity: 1, y: 0 }} threshold={0.1} rootMargin="-100px" textAlign="inherit" /><SplitText tag="span" text="streets" className="np-hero-streets" delay={200} duration={0.9} ease="power3.out" splitType="chars" from={{ opacity: 0, y: 60 }} to={{ opacity: 1, y: 0 }} threshold={0.1} rootMargin="-100px" textAlign="inherit" /><SplitText tag="span" text=", right on schedule." delay={200} duration={0.9} ease="power3.out" splitType="chars" from={{ opacity: 0, y: 60 }} to={{ opacity: 1, y: 0 }} threshold={0.1} rootMargin="-100px" textAlign="inherit" /></h1>
             <p className="np-lead">Yaazh Clean360 connects every resident with the correct zone, assigned lorry and Monday–Saturday waste collection timetable.</p>
             <div className="np-actions">
               <Link className="np-button np-button--purple" href="/login">Get started <span>→</span></Link>
