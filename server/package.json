@@ -5,7 +5,8 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "seed:zones": "tsx src/seeds/seedZones.ts"
+    "seed:zones": "tsx src/seeds/seedZones.ts",
+    "seed:admin": "tsx src/seeds/seedAdmin.ts"
   },
   "dependencies": {
     "@types/nodemailer": "^8.0.1",

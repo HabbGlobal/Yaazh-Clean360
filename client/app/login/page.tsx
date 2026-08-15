@@ -26,7 +26,7 @@ export default function Login() {
       setLoading(true);
       const result = await api.login({ email: String(form.get("email")), password: String(form.get("password")) });
       setToken(result.token);
-      router.push(result.user.zoneId ? "/dashboard" : "/select-zone");
+      router.push(result.user.role === "admin" ? "/admin" : result.user.zoneId ? "/dashboard" : "/select-zone");
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Unable to sign in");
     } finally {
@@ -66,7 +66,7 @@ export default function Login() {
       setLoading(true);
       const result = await api.resetPassword({ email, code: String(form.get("code")), password });
       setToken(result.token);
-      router.push("/dashboard");
+      router.push(result.user.role === "admin" ? "/admin" : "/dashboard");
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Unable to reset password");
     } finally {

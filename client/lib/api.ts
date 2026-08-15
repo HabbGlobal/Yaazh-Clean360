@@ -1,5 +1,5 @@
 import { getToken } from "./auth-storage";
-import type { Complaint, ComplaintType, Feedback, FeedbackSummary, ReadinessResponse, ReadinessSummary, Schedule, User, Zone } from "@/types";
+import type { AdminComplaint, AdminFeedback, AdminFeedbackSummary, AdminOverview, AdminVote, AdminVoteSummary, Complaint, ComplaintType, Feedback, FeedbackSummary, ReadinessResponse, ReadinessSummary, Schedule, User, Zone } from "@/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
@@ -32,5 +32,22 @@ export const api = {
   createFeedback: (payload: { rating: number; comment?: string }) => request<Feedback>("/resident/feedback", { method: "POST", body: JSON.stringify(payload) }),
   createSchedule: (data: Omit<Schedule, "_id">) => request<Schedule>("/schedules", { method: "POST", body: JSON.stringify(data) }),
   updateSchedule: (id: string, data: Partial<Schedule>) => request<Schedule>(`/schedules/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
-  deleteSchedule: (id: string) => request<void>(`/schedules/${id}`, { method: "DELETE" })
+  deleteSchedule: (id: string) => request<void>(`/schedules/${id}`, { method: "DELETE" }),
+  updateZone: (id: string, data: Partial<Zone>) => request<Zone>(`/zones/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+  createZone: (data: Omit<Zone, "_id" | "zoneNumber">) => request<Zone>("/zones", { method: "POST", body: JSON.stringify(data) }),
+  deleteZone: (id: string) => request<Zone>(`/zones/${id}`, { method: "DELETE" }),
+  adminOverview: () => request<AdminOverview>("/admin/overview"),
+  adminZones: () => request<Zone[]>("/admin/zones"),
+  adminSchedules: () => request<Schedule[]>("/admin/schedules"),
+  adminResidents: () => request<User[]>("/admin/residents"),
+  updateResidentStatus: (id: string, accountStatus: "active" | "suspended") => request<User>(`/admin/residents/${id}/status`, { method: "PATCH", body: JSON.stringify({ accountStatus }) }),
+  deleteResident: (id: string) => request<void>(`/admin/residents/${id}`, { method: "DELETE" }),
+  adminComplaints: () => request<AdminComplaint[]>("/admin/complaints"),
+  updateAdminComplaint: (id: string, data: { status: "submitted" | "in-review" | "resolved"; resolutionNote?: string }) => request<{ complaint: AdminComplaint; notification: string }>(`/admin/complaints/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+  deleteAdminComplaint: (id: string) => request<void>(`/admin/complaints/${id}`, { method: "DELETE" }),
+  adminVotes: () => request<AdminVote[]>("/admin/votes"),
+  adminVoteSummary: (date?: string) => request<AdminVoteSummary>(`/admin/votes/summary${date ? `?date=${date}` : ""}`),
+  adminFeedback: () => request<AdminFeedback[]>("/admin/feedback"),
+  adminFeedbackSummary: () => request<AdminFeedbackSummary>("/admin/feedback/summary"),
+  updateAdminProfile: (data: { name?: string; email?: string; phone?: string; address?: string; profileImage?: string; password?: string }) => request<User>("/admin/profile", { method: "PATCH", body: JSON.stringify(data) })
 };

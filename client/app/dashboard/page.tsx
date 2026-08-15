@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import yaazhLogo from "@/assets/logo yaazh.png";
 import ResidentNav from "@/components/common/ResidentNav";
+import Ferrofluid from "@/components/dashboard/Ferrofluid";
 import { api } from "@/lib/api";
 import type { Complaint, ComplaintType, FeedbackSummary, ReadinessResponse, ReadinessSummary, Schedule, User, Zone } from "@/types";
 
@@ -141,6 +142,25 @@ export default function Dashboard() {
 
   return (
     <section className="resident-dashboard">
+      <div className="resident-page-fluid" aria-hidden="true">
+        <Ferrofluid
+          colors={["#36cfa0", "#8655ef", "#ffbd24", "#ec64ad"]}
+          speed={0.2}
+          scale={1.45}
+          turbulence={0.82}
+          fluidity={0.18}
+          rimWidth={0.22}
+          sharpness={2.6}
+          shimmer={1.25}
+          glow={1.8}
+          flowDirection="right"
+          opacity={0.62}
+          mouseInteraction
+          mouseStrength={0.55}
+          mouseRadius={0.34}
+          mixBlendMode="multiply"
+        />
+      </div>
       <ResidentNav user={user} />
 
       <div className="resident-container">

@@ -9,7 +9,7 @@ import AuthNav from "@/components/auth/AuthNav";
 
 export default function SiteHeader() {
   const pathname = usePathname();
-  if (pathname === "/dashboard" || pathname === "/profile") return null;
+  if (pathname === "/dashboard" || pathname === "/profile" || pathname.startsWith("/admin")) return null;
 
   return (
     <header className="site-header">
