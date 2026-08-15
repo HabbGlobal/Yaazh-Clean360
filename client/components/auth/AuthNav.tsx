@@ -1,2 +1,2 @@
 import Link from "next/link";
-export default function AuthNav(){return <nav className="auth-nav" aria-label="Account"><Link className="nav-login" href="/login">Log in</Link><Link className="nav-signup" href="/signup">Sign up</Link></nav>}
+export default function AuthNav(){return <nav className="auth-nav" aria-label="Primary navigation"><div className="nav-sections"><Link href="/#features">Features</Link><Link href="/#how-it-works">How it works</Link><Link href="/#zones">Zones</Link><Link href="/#voting">Voting</Link><Link href="/#complaints">Complaints</Link></div><Link className="nav-signup" href="/login">Get started</Link></nav>}

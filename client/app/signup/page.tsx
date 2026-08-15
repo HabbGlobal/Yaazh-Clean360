@@ -45,7 +45,7 @@ export default function Signup() {
         profileImage = await fileToBase64(profileFile);
       }
       const email = String(form.get("email"));
-      await api.register({ name: String(form.get("name")), email, password, zoneId: selectedZone._id, profileImage });
+      await api.register({ name: String(form.get("name")), email, phone: String(form.get("phone")), address: String(form.get("address")), password, zoneId: selectedZone._id, profileImage });
       setPendingEmail(email);
       router.push("/verify-email");
     } catch (requestError) {
@@ -55,18 +55,21 @@ export default function Signup() {
     }
   }
 
-  return <section className="auth-page">
-    <form className="signup-form" onSubmit={submit}>
-      <div className="auth-heading"><span className="eyebrow">Resident registration</span><h1>Create your account</h1><p>Enter your details and choose the zone shown on your local collection map.</p></div>
+  return <section className="auth-shell auth-shell--signup">
+    <div className="auth-orbit auth-orbit--signup" aria-hidden="true"><i /><b /><em /></div>
+    <form className="signup-form auth-card auth-card--wide" onSubmit={submit}>
+      <div className="auth-heading"><span className="np-sticker np-sticker--pink">Resident registration</span><h1>Create your account</h1><p>Enter your details, add your address and phone number, then choose the zone shown on your local collection map.</p></div>
       {error && <p className="error" role="alert">{error}</p>}
       <div className="form-grid">
         <label>Full name<input name="name" autoComplete="name" placeholder="Your full name" required /></label>
         <label>Email address<input name="email" type="email" autoComplete="email" placeholder="you@example.com" required /></label>
+        <label>Phone number<input name="phone" type="tel" autoComplete="tel" placeholder="07X XXX XXXX" required /></label>
+        <label>Home address<input name="address" autoComplete="street-address" placeholder="House number, street, area" required /></label>
         <label>Password<input name="password" type="password" autoComplete="new-password" minLength={8} placeholder="Minimum 8 characters" required /></label>
         <label>Confirm password<input name="confirmPassword" type="password" autoComplete="new-password" minLength={8} placeholder="Re-enter password" required /></label>
       </div>
       <label>Profile image <span className="optional">(optional)</span><input name="profileImage" type="file" accept="image/png,image/jpeg,image/webp,image/gif" /></label>
-      <fieldset className="zone-fieldset"><legend>Select your zone</legend><p className="muted">Your assigned collection lorry appears when you select a zone.</p><div className="zone-signup-grid">{zones.map(zone => <ZoneCard key={zone._id} zone={zone} selected={selectedZone?._id === zone._id} onSelect={setSelectedZone} />)}</div></fieldset>
+      <fieldset className="zone-fieldset"><legend>Select your zone</legend><p className="muted">Hover or tap each map to clearly preview your collection area and assigned lorry.</p><div className="zone-signup-grid">{zones.map(zone => <ZoneCard key={zone._id} zone={zone} selected={selectedZone?._id === zone._id} onSelect={setSelectedZone} />)}</div></fieldset>
       {selectedZone && <div className="lorry-assignment"><span>Assigned collection lorry</span><strong>{selectedZone.assignedLorry}</strong><small>{selectedZone.name}</small></div>}
       <button disabled={submitting || !selectedZone}>{submitting ? "Creating account…" : "Create account"}</button>
       <p className="auth-switch">Already have an account? <Link href="/login">Log in</Link></p>
