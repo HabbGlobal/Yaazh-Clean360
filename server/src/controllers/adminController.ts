@@ -2,6 +2,7 @@ import type { NextFunction, Response } from "express";
 import bcrypt from "bcryptjs";
 import type { AuthRequest } from "../middleware/authenticate";
 import { ApiError } from "../utils/ApiError";
+import { strongPassword } from "../validators/authValidator";
 import { User } from "../models/User";
 import { Zone } from "../models/Zone";
 import { Complaint, COMPLAINT_TYPES } from "../models/Complaint";
@@ -62,8 +63,8 @@ export async function adminOverview(_req: AuthRequest, res: Response, next: Next
 }
 
 export async function listAdminZones(_req: AuthRequest, res: Response, next: NextFunction) {
-  try { res.json({ data: await Zone.find().sort({ zoneNumber: 1 }) }); }
-  catch (error) { next(error); }
+  try { res.json({ data: await Zone.find().sort({ zoneNumber: 1 }).select("-imageBase64") }); }
+  catch (e) { next(e); }
 }
 
 export async function listResidents(_req: AuthRequest, res: Response, next: NextFunction) {
@@ -137,7 +138,7 @@ export async function listAdminVotes(_req: AuthRequest, res: Response, next: Nex
 export async function listAdminVoteSummary(req: AuthRequest, res: Response, next: NextFunction) {
   try {
     const voteDate = String(req.query.date || colomboDate());
-    const zones = await Zone.find({ isActive: true }).sort({ zoneNumber: 1 });
+    const zones = await Zone.find({ isActive: true }).sort({ zoneNumber: 1 }).select("-imageBase64");
     const residentCounts = await User.aggregate([
       { $match: { role: "resident", accountStatus: "active", zoneId: { $exists: true, $ne: null } } },
       { $group: { _id: "$zoneId", count: { $sum: 1 } } }
@@ -197,7 +198,11 @@ export async function updateAdminProfile(req: AuthRequest, res: Response, next: 
   try {
     const update: Record<string, unknown> = {};
     for (const key of ["name", "email", "phone", "address", "profileImage"]) if (req.body[key] !== undefined) update[key] = req.body[key];
-    if (req.body.password) update.password = await bcrypt.hash(req.body.password, 12);
+    if (req.body.password) {
+      const check = strongPassword.safeParse(req.body.password);
+      if (!check.success) throw new ApiError(400, check.error.issues[0]?.message || "Password is too weak");
+      update.password = await bcrypt.hash(req.body.password, 12);
+    }
     const user = await User.findByIdAndUpdate(req.auth!.userId, update, { new: true, runValidators: true });
     if (!user) throw new ApiError(404, "Administrator not found");
     res.json({ data: safeUser(user) });

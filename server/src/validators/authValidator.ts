@@ -1,9 +1,10 @@
 import { z } from "zod";
 const base64Image=z.string().max(3_000_000).regex(/^data:image\/(png|jpe?g|webp|gif);base64,/i,"Image must be a base64 image data URL");
-export const registerSchema=z.object({name:z.string().trim().min(2).max(80),email:z.string().email(),phone:z.string().trim().min(7).max(20).regex(/^[0-9+\-\s()]+$/,"Enter a valid phone number"),address:z.string().trim().min(5).max(220),password:z.string().min(8).max(128),zoneId:z.string().regex(/^[a-fA-F0-9]{24}$/,"Select a valid zone"),profileImage:base64Image.optional()});
+export const strongPassword=z.string().min(8,"Password must be at least 8 characters").max(128,"Password must be at most 128 characters").regex(/[a-z]/,"Password must include a lowercase letter").regex(/[A-Z]/,"Password must include an uppercase letter").regex(/[0-9]/,"Password must include a number").regex(/[^A-Za-z0-9]/,"Password must include a special character (e.g. !@#$%^&*)");
+export const registerSchema=z.object({name:z.string().trim().min(2).max(80),email:z.string().email(),phone:z.string().trim().min(7).max(20).regex(/^[0-9+\-\s()]+$/,"Enter a valid phone number"),address:z.string().trim().min(5).max(220),password:strongPassword,zoneId:z.string().regex(/^[a-fA-F0-9]{24}$/,"Select a valid zone"),profileImage:base64Image.optional()});
 export const loginSchema=z.object({email:z.string().email(),password:z.string().min(1)});
 export const forgotPasswordSchema=z.object({email:z.string().email()});
-export const resetPasswordSchema=z.object({email:z.string().email(),code:z.string().regex(/^\d{6}$/,"Enter the 6-digit reset code"),password:z.string().min(8).max(128)});
+export const resetPasswordSchema=z.object({email:z.string().email(),code:z.string().regex(/^\d{6}$/,"Enter the 6-digit reset code"),password:strongPassword});
 export const zoneSelectionSchema=z.object({zoneId:z.string().regex(/^[a-fA-F0-9]{24}$/,"A valid zone is required")});
 export const verifyOtpSchema=z.object({email:z.string().email(),code:z.string().regex(/^\d{6}$/,"Enter the 6-digit verification code")});
 export const resendOtpSchema=z.object({email:z.string().email()});

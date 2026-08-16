@@ -14,6 +14,7 @@ const navItems = [
 export default function AuthNav() {
   const pathname = usePathname();
   const [activeHash, setActiveHash] = useState("");
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (pathname !== "/") return;
@@ -39,6 +40,13 @@ export default function AuthNav() {
     };
   }, [pathname]);
 
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width:901px)");
+    const close = () => setOpen(false);
+    desktop.addEventListener("change", close);
+    return () => desktop.removeEventListener("change", close);
+  }, []);
+
   return (
     <nav className="auth-nav" aria-label="Primary navigation">
       <div className="nav-sections">
@@ -49,6 +57,18 @@ export default function AuthNav() {
         ))}
       </div>
       <Link className="nav-signup" href="/login">Get started</Link>
+      <button type="button" className={`nav-menu-toggle${open ? " nav-menu-toggle--open" : ""}`} aria-expanded={open} aria-controls="site-nav-menu" aria-label={open ? "Close navigation menu" : "Open navigation menu"} onClick={() => setOpen((value) => !value)}>
+        <span aria-hidden="true" /><span aria-hidden="true" /><span aria-hidden="true" />
+      </button>
+      {open && <div className="nav-menu-backdrop" onClick={() => setOpen(false)} aria-hidden="true" />}
+      {open && (
+        <div className="nav-mobile-menu" id="site-nav-menu">
+          {navItems.map((item) => (
+            <Link key={item.hash} className={pathname === "/" && activeHash === item.hash ? "active" : undefined} href={item.href} onClick={() => setOpen(false)}>{item.label}</Link>
+          ))}
+          <Link className="nav-mobile-signup" href="/login" onClick={() => setOpen(false)}>Get started</Link>
+        </div>
+      )}
     </nav>
   );
 }

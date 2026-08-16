@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { api } from "@/lib/api";
+import { api, zoneMapUrl } from "@/lib/api";
 import type { Zone } from "@/types";
 
 const PAGE_SIZE = 5;
@@ -123,7 +123,7 @@ export default function ManageZones() {
           {paged.map((zone) => (
             <button type="button" className="admin-zone-tile" key={zone._id} onClick={() => { setError(""); setSelected(zone); }}>
               <span className="admin-zone-tile-media">
-                <img src={zone.imageBase64} alt={`${zone.name} map`} />
+                <img src={zoneMapUrl(zone._id)} alt={`${zone.name} map`} />
                 <span className="admin-zone-number">Zone {zone.zoneNumber}</span>
               </span>
               <span className="admin-zone-tile-body">
@@ -174,7 +174,7 @@ export default function ManageZones() {
         <div className="admin-modal-backdrop" onClick={() => setSelected(null)}>
           <form className="admin-modal admin-zone-modal" key={selected._id} onClick={(event) => event.stopPropagation()} onSubmit={(event) => void saveZone(event, selected)}>
             <button type="button" className="admin-modal-close" onClick={() => setSelected(null)} aria-label="Close zone details">✕</button>
-            <img className="admin-zone-modal-media" src={selected.imageBase64} alt={`${selected.name} map`} />
+            <img className="admin-zone-modal-media" src={zoneMapUrl(selected._id)} alt={`${selected.name} map`} />
             <header className="admin-modal-head">
               <div><p>Collection zone</p><h2>{selected.name}</h2><small>Lorry {selected.assignedLorry}</small></div>
               <span className={`admin-status ${selected.isActive ? "active" : "suspended"}`}>{selected.isActive ? "Active" : "Inactive"}</span>

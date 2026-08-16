@@ -1,8 +1,11 @@
 "use client";
 
 import ZoneCard from "@/components/zones/ZoneCard";
+import PasswordStrength from "@/components/common/PasswordStrength";
+import PasswordField from "@/components/common/PasswordField";
 import { api } from "@/lib/api";
 import { setPendingEmail } from "@/lib/auth-storage";
+import { passwordIssues } from "@/lib/password";
 import type { Zone } from "@/types";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -23,6 +26,7 @@ export default function Signup() {
   const [selectedZone, setSelectedZone] = useState<Zone | null>(null);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     api.zones().then(setZones).catch((requestError) => setError(requestError.message));
@@ -34,6 +38,7 @@ export default function Signup() {
     const form = new FormData(event.currentTarget);
     const password = String(form.get("password"));
     if (password !== String(form.get("confirmPassword"))) return setError("Passwords do not match");
+    if (passwordIssues(password).length) return setError(`Choose a stronger password. It must include: ${passwordIssues(password).join(", ")}.`);
     if (!selectedZone) return setError("Select your waste collection zone");
 
     const profileFile = form.get("profileImage") as File;
@@ -65,9 +70,10 @@ export default function Signup() {
         <label>Email address<input name="email" type="email" autoComplete="email" placeholder="you@example.com" required /></label>
         <label>Phone number<input name="phone" type="tel" autoComplete="tel" placeholder="07X XXX XXXX" required /></label>
         <label>Home address<input name="address" autoComplete="street-address" placeholder="House number, street, area" required /></label>
-        <label>Password<input name="password" type="password" autoComplete="new-password" minLength={8} placeholder="Minimum 8 characters" required /></label>
-        <label>Confirm password<input name="confirmPassword" type="password" autoComplete="new-password" minLength={8} placeholder="Re-enter password" required /></label>
+        <label>Password<PasswordField name="password" autoComplete="new-password" minLength={8} placeholder="Minimum 8 characters" required value={password} onChange={setPassword} /></label>
+        <label>Confirm password<PasswordField name="confirmPassword" autoComplete="new-password" minLength={8} placeholder="Re-enter password" required /></label>
       </div>
+      <PasswordStrength password={password} />
       <label>Profile image <span className="optional">(optional)</span><input name="profileImage" type="file" accept="image/png,image/jpeg,image/webp,image/gif" /></label>
       <fieldset className="zone-fieldset"><legend>Select your zone</legend><p className="muted">Hover or tap each map to clearly preview your collection area and assigned lorry.</p><div className="zone-signup-grid">{zones.map(zone => <ZoneCard key={zone._id} zone={zone} selected={selectedZone?._id === zone._id} onSelect={setSelectedZone} />)}</div></fieldset>
       {selectedZone && <div className="lorry-assignment"><span>Assigned collection lorry</span><strong>{selectedZone.assignedLorry}</strong><small>{selectedZone.name}</small></div>}

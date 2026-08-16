@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import ResidentNav from "@/components/common/ResidentNav";
-import { api } from "@/lib/api";
+import { api, zoneMapUrl } from "@/lib/api";
 import { clearToken } from "@/lib/auth-storage";
 import { useGuard } from "@/lib/use-guard";
 import type { User, Zone } from "@/types";
@@ -121,7 +121,7 @@ export default function Profile() {
 
           <article className="resident-card profile-zone-card">
             <div className="resident-card-head"><span>Selected Zone</span><strong>{zone?.assignedLorry || "No lorry"}</strong></div>
-            {zone?.imageBase64 ? <img src={zone.imageBase64} alt={`${zone.name} map`} /> : <p className="muted">No zone selected.</p>}
+            {zone ? <img src={zoneMapUrl(zone._id)} alt={`${zone.name} map`} /> : <p className="muted">No zone selected.</p>}
             <h3>{zone?.name || "Select a zone"}</h3>
             <p>{zone?.description || "Choose your collection area to receive schedule updates."}</p>
             <button className="resident-button" type="button" onClick={() => setZoneModalOpen(true)}>Change zone</button>
@@ -144,8 +144,8 @@ export default function Profile() {
             <div className="zone-modal-grid">
               {zones.map((item) => (
                 <button className={item._id === zone?._id ? "active" : ""} type="button" onClick={() => changeZone(item._id)} key={item._id}>
-                  <img className="zone-modal-thumb" src={item.imageBase64} alt={`${item.name} map`} />
-                  <span className="zone-modal-preview" aria-hidden="true"><img src={item.imageBase64} alt="" /></span>
+                  <img className="zone-modal-thumb" src={zoneMapUrl(item._id)} alt={`${item.name} map`} />
+                  <span className="zone-modal-preview" aria-hidden="true"><img src={zoneMapUrl(item._id)} alt="" /></span>
                   <span><b>{item.name}</b><small>{item.assignedLorry}</small></span>
                 </button>
               ))}

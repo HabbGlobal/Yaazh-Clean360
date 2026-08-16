@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import yaazhLogo from "@/assets/logo yaazh.png";
 import ResidentNav from "@/components/common/ResidentNav";
 import Ferrofluid from "@/components/dashboard/Ferrofluid";
-import { api } from "@/lib/api";
+import { api, zoneMapUrl } from "@/lib/api";
 import type { Complaint, ComplaintType, FeedbackSummary, ReadinessResponse, ReadinessSummary, Schedule, User, Zone } from "@/types";
 
 const complaintLabels: Record<ComplaintType, string> = {
@@ -53,23 +53,28 @@ export default function Dashboard() {
   const [message, setMessage] = useState("");
   const zone = typeof user?.zoneId === "string" ? undefined : user?.zoneId as Zone | undefined;
 
+  async function loadDataset<T>(promise: Promise<T>, apply: (value: T) => void) {
+    try {
+      apply(await promise);
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : "Unable to load some dashboard data");
+    }
+  }
+
   async function loadDashboard() {
-    const current = await api.me();
-    setUser(current);
-    const zoneId = typeof current.zoneId === "string" ? current.zoneId : current.zoneId?._id;
-    if (!zoneId) return;
-    const [scheduleData, readinessData, historyData, complaintData, feedbackData] = await Promise.all([
-      api.schedules(zoneId),
-      api.readiness(),
-      api.readinessHistory(),
-      api.complaints(),
-      api.feedback()
-    ]);
-    setSchedules(scheduleData);
-    setReadiness(readinessData);
-    setReadinessHistory(historyData);
-    setComplaints(complaintData);
-    setFeedback(feedbackData);
+    try {
+      const current = await api.me();
+      setUser(current);
+      const zoneId = typeof current.zoneId === "string" ? current.zoneId : current.zoneId?._id;
+      if (!zoneId) return;
+      loadDataset(api.schedules(zoneId), setSchedules);
+      loadDataset(api.readiness(), setReadiness);
+      loadDataset(api.readinessHistory(), setReadinessHistory);
+      loadDataset(api.complaints(), setComplaints);
+      loadDataset(api.feedback(), setFeedback);
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : "Unable to load dashboard");
+    }
   }
 
   useEffect(() => {
@@ -176,7 +181,7 @@ export default function Dashboard() {
             <p>Track your lorry, schedule, readiness voting, complaint status, and service rating from one mobile-friendly workspace.</p>
           </div>
           <aside className="resident-lorry-card">
-            {zone?.imageBase64 && <img className="resident-zone-image" src={zone.imageBase64} alt={`${zone.name} map`} />}
+            {zone ? <img className="resident-zone-image" src={zoneMapUrl(zone._id)} alt={`${zone.name} map`} /> : null}
             <span>Assigned lorry</span>
             <strong>{zone?.assignedLorry || "Loading"}</strong>
             <small>Pradesa Sabha help is available from the glowing call popup.</small>

@@ -2,12 +2,23 @@ import { getToken } from "./auth-storage";
 import type { AdminComplaint, AdminFeedback, AdminFeedbackSummary, AdminOverview, AdminVote, AdminVoteSummary, Complaint, ComplaintType, Feedback, FeedbackSummary, ReadinessResponse, ReadinessSummary, Schedule, User, Zone } from "@/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const REQUEST_TIMEOUT_MS = 30000;
+export const zoneMapUrl = (zoneId: string) => `${API_URL}/zones/${zoneId}/map`;
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const token = getToken();
-  const response = await fetch(`${API_URL}${path}`, { ...options, headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}), ...options.headers } });
-  const body = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(body.message || "Request failed");
-  return body.data as T;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const token = getToken();
+    const response = await fetch(`${API_URL}${path}`, { ...options, signal: controller.signal, headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}), ...options.headers } });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(body.message || "Request failed");
+    return body.data as T;
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") throw new Error("The server took too long to respond. Please try again.");
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 export const api = {
   register: (payload: { name: string; email: string; phone: string; address: string; password: string; zoneId: string; profileImage?: string }) => request<{ email: string; message: string }>("/auth/register", { method: "POST", body: JSON.stringify(payload) }),

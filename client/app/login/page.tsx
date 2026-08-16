@@ -4,32 +4,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import PasswordStrength from "@/components/common/PasswordStrength";
+import PasswordField from "@/components/common/PasswordField";
 import { api } from "@/lib/api";
 import { setToken } from "@/lib/auth-storage";
+import { passwordIssues } from "@/lib/password";
 
 type AuthMode = "login" | "forgot" | "reset";
-
-function PasswordField({ name, autoComplete, placeholder, required }: { name: string; autoComplete: string; placeholder: string; required?: boolean }) {
-  const [visible, setVisible] = useState(false);
-  return (
-    <span className="password-field">
-      <input name={name} type={visible ? "text" : "password"} autoComplete={autoComplete} placeholder={placeholder} required={required} />
-      <button
-        type="button"
-        className="password-toggle"
-        aria-label={visible ? "Hide password" : "Show password"}
-        aria-pressed={visible}
-        onClick={() => setVisible((value) => !value)}
-      >
-        {visible ? (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 3l18 18" /><path d="M10.6 5.1A10.9 10.9 0 0 1 12 5c6.5 0 10 6.5 10 6.5a18.4 18.4 0 0 1-3.2 4M6.3 6.3A18 18 0 0 0 2 11.5S5.5 18 12 18a9.7 9.7 0 0 0 4.7-1.2" /><path d="M9.9 9.9a2.8 2.8 0 0 0 4 4" /></svg>
-        ) : (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z" /><circle cx="12" cy="12" r="2.8" /></svg>
-        )}
-      </button>
-    </span>
-  );
-}
 
 export default function Login() {
   const router = useRouter();
@@ -38,6 +19,7 @@ export default function Login() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
 
   async function submitLogin(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -82,6 +64,10 @@ export default function Login() {
     const password = String(form.get("password"));
     if (password !== String(form.get("confirmPassword"))) {
       setError("Passwords do not match");
+      return;
+    }
+    if (passwordIssues(password).length) {
+      setError(`Choose a stronger password. It must include: ${passwordIssues(password).join(", ")}.`);
       return;
     }
     try {
@@ -143,8 +129,9 @@ export default function Login() {
             <form className="auth-panel-form" onSubmit={resetPassword}>
               <label>Email address<input value={email} onChange={(event) => setEmail(event.target.value)} type="email" required /></label>
               <label>OTP code<input name="code" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} placeholder="6-digit code" required /></label>
-              <label>New password<input name="password" type="password" autoComplete="new-password" minLength={8} placeholder="Minimum 8 characters" required /></label>
+              <label>New password<PasswordField name="password" autoComplete="new-password" minLength={8} placeholder="Minimum 8 characters" required value={newPassword} onChange={setNewPassword} /></label>
               <label>Confirm password<input name="confirmPassword" type="password" autoComplete="new-password" minLength={8} placeholder="Re-enter password" required /></label>
+              <PasswordStrength password={newPassword} />
               <button disabled={loading}>{loading ? "Resetting..." : "Reset password and open dashboard"}</button>
               <button type="button" className="auth-text-button" onClick={() => setMode("forgot")}>Send another OTP</button>
             </form>
