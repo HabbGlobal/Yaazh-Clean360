@@ -2,6 +2,8 @@ import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 
 import ZoneCardSpread from "@/components/landing/ZoneCardSpread";
+import PixelBlast from "@/components/landing/PixelBlast";
+import StrokeText from "@/components/landing/StrokeText";
 import SplitText from "@/components/common/SplitText";
 import yaazhLogo from "@/assets/logo yaazh.png";
 import welcomeImage from "@/assets/images/welcome.png";
@@ -56,7 +58,28 @@ function FeatureIcon({ name }: { name: string }) {
 export default function Home() {
   return (
     <div className="np-landing">
-      <section className="np-hero np-dots" aria-labelledby="hero-title">
+      <section className="np-hero" aria-labelledby="hero-title">
+        <div className="np-hero-pixels" aria-hidden="true">
+          <PixelBlast
+            variant="circle"
+            pixelSize={10}
+            color="#B497CF"
+            patternScale={3.5}
+            patternDensity={2.8}
+            pixelSizeJitter={0.5}
+            enableRipples
+            rippleSpeed={0.4}
+            rippleThickness={0.12}
+            rippleIntensityScale={1.5}
+            liquid
+            liquidStrength={0.12}
+            liquidRadius={1.2}
+            liquidWobbleSpeed={5}
+            speed={0.6}
+            edgeFade={0.06}
+            transparent
+          />
+        </div>
         <span className="np-shape np-shape--hero-logo" aria-hidden="true"><Image src={yaazhLogo} alt="" sizes="120px" /></span><span className="np-shape np-shape--diamond" aria-hidden="true" />
         <div className="np-container np-hero__grid">
           <div className="np-hero__copy">
@@ -95,7 +118,7 @@ export default function Home() {
       <section className="np-story" aria-labelledby="story-heading">
         <div className="np-container np-story__grid">
           <div className="np-story__visual" aria-hidden="true"><span className="np-story__card np-story__card--back" /><span className="np-story__card np-story__card--front"><b>MON</b><strong>07:30</strong><small>ZONE 03 · RH 9424</small></span></div>
-          <div className="np-story__copy"><p className="np-sticker np-sticker--mint">One reliable source</p><h2 id="story-heading">No more guessing when the lorry will arrive.</h2><p>Your dashboard brings the important details together: collection day, time, waste category, zone and assigned vehicle. Information stays readable on mobile, tablet and desktop.</p><blockquote>“Designed around the simple question every resident asks: when is my waste being collected?”</blockquote></div>
+          <div className="np-story__copy"><p className="np-sticker np-sticker--mint">One reliable source</p><h2 id="story-heading"><span className="np-story-anim"><StrokeText text="No" strokeColor="#1d293d" fillColor="#1d293d" fontSize={64} fontWeight={900} letterSpacing={-2.88} drawDuration={1.4} fillDelay={0.25} stagger={0.05} ease="power2.out" trigger="scroll" fillMode="wipe" /><StrokeText text="more guessing" strokeColor="#ec64ad" fillColor="#ec64ad" fontSize={64} fontWeight={900} letterSpacing={-2.88} drawDuration={1.4} fillDelay={0.25} stagger={0.05} ease="power2.out" trigger="scroll" fillMode="wipe" /><StrokeText text="when the lorry will" strokeColor="#1d293d" fillColor="#1d293d" fontSize={64} fontWeight={900} letterSpacing={-2.88} drawDuration={1.4} fillDelay={0.25} stagger={0.05} ease="power2.out" trigger="scroll" fillMode="wipe" /><StrokeText text="arrive." strokeColor="#ffbd24" fillColor="#ffbd24" fontSize={64} fontWeight={900} letterSpacing={-2.88} drawDuration={1.4} fillDelay={0.25} stagger={0.05} ease="power2.out" trigger="scroll" fillMode="wipe" /></span></h2><p>Your dashboard brings the important details together: collection day, time, waste category, zone and assigned vehicle. Information stays readable on mobile, tablet and desktop.</p><blockquote>“Designed around the simple question every resident asks: when is my waste being collected?”</blockquote></div>
         </div>
       </section>
 
