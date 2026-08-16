@@ -16,7 +16,7 @@ export default function AppFrame({ children }: Readonly<{ children: React.ReactN
   return (
     <>
       <SiteHeader />
-      <main className="app-main">{children}</main>
+      <main className={`app-main${pathname === "/" ? " app-main--landing" : ""}`}>{children}</main>
       <CallPopup />
     </>
   );

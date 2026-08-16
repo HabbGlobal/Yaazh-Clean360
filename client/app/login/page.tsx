@@ -9,6 +9,28 @@ import { setToken } from "@/lib/auth-storage";
 
 type AuthMode = "login" | "forgot" | "reset";
 
+function PasswordField({ name, autoComplete, placeholder, required }: { name: string; autoComplete: string; placeholder: string; required?: boolean }) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <span className="password-field">
+      <input name={name} type={visible ? "text" : "password"} autoComplete={autoComplete} placeholder={placeholder} required={required} />
+      <button
+        type="button"
+        className="password-toggle"
+        aria-label={visible ? "Hide password" : "Show password"}
+        aria-pressed={visible}
+        onClick={() => setVisible((value) => !value)}
+      >
+        {visible ? (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 3l18 18" /><path d="M10.6 5.1A10.9 10.9 0 0 1 12 5c6.5 0 10 6.5 10 6.5a18.4 18.4 0 0 1-3.2 4M6.3 6.3A18 18 0 0 0 2 11.5S5.5 18 12 18a9.7 9.7 0 0 0 4.7-1.2" /><path d="M9.9 9.9a2.8 2.8 0 0 0 4 4" /></svg>
+        ) : (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z" /><circle cx="12" cy="12" r="2.8" /></svg>
+        )}
+      </button>
+    </span>
+  );
+}
+
 export default function Login() {
   const router = useRouter();
   const [mode, setMode] = useState<AuthMode>("login");
@@ -103,7 +125,7 @@ export default function Login() {
           {mode === "login" && (
             <form className="auth-panel-form" onSubmit={submitLogin}>
               <label>Email address<input name="email" type="email" autoComplete="email" placeholder="you@example.com" required /></label>
-              <label>Password<input name="password" type="password" autoComplete="current-password" placeholder="Your password" required /></label>
+              <label>Password<PasswordField name="password" autoComplete="current-password" placeholder="Your password" required /></label>
               <button disabled={loading}>{loading ? "Signing in..." : "Sign in"}</button>
               <button type="button" className="auth-text-button" onClick={() => { setMode("forgot"); setError(""); setMessage(""); }}>Forgotten your password?</button>
             </form>
