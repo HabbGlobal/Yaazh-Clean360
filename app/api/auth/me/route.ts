@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { User } from "@/server/models/User";
+import "@/server/models/Zone";
 import { ApiError } from "@/server/utils/ApiError";
 import { handle } from "@/server/handler";
 import { requireAuth } from "@/server/auth";
