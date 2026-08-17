@@ -10,9 +10,11 @@ export const GET = handle(async (req: NextRequest) => {
   const auth = await requireAuth(req, ["resident"]);
   const zoneId = await getResidentZoneId(auth.userId);
   const dates = recentCollectionDates();
-  const votes = await ReadinessVote.find({ zoneId, voteDate: { $in: dates } });
-  const mine = await ReadinessVote.find({ userId: auth.userId, voteDate: { $in: dates } });
-  const zoneResidentCount = await User.countDocuments({ zoneId, role: "resident", accountStatus: "active" });
+  const [votes, mine, zoneResidentCount] = await Promise.all([
+    ReadinessVote.find({ zoneId, voteDate: { $in: dates } }),
+    ReadinessVote.find({ userId: auth.userId, voteDate: { $in: dates } }),
+    User.countDocuments({ zoneId, role: "resident", accountStatus: "active" })
+  ]);
   return NextResponse.json({
     data: dates.map((voteDate) => {
       const dayVotes = votes.filter((vote) => vote.voteDate === voteDate);

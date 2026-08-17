@@ -7,7 +7,7 @@ import { getResidentZoneId } from "@/server/resident";
 
 export const GET = handle(async (req: NextRequest) => {
   const auth = await requireAuth(req, ["resident"]);
-  return NextResponse.json({ data: await Complaint.find({ userId: auth.userId }).sort({ createdAt: -1 }).limit(20) });
+  return NextResponse.json({ data: await Complaint.find({ userId: auth.userId }).sort({ createdAt: -1 }).limit(20).select("-photoEvidence") });
 });
 
 export const POST = handle(async (req: NextRequest) => {

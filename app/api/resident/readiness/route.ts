@@ -26,11 +26,13 @@ export const GET = handle(async (req: NextRequest) => {
   const auth = await requireAuth(req, ["resident"]);
   const zoneId = await getResidentZoneId(auth.userId);
   const voteDate = String(req.nextUrl.searchParams.get("date") || today());
-  const votes = await ReadinessVote.find({ zoneId, voteDate });
-  const zoneResidentCount = await User.countDocuments({ zoneId, role: "resident", accountStatus: "active" });
+  const [votes, zoneResidentCount, mine] = await Promise.all([
+    ReadinessVote.find({ zoneId, voteDate }),
+    User.countDocuments({ zoneId, role: "resident", accountStatus: "active" }),
+    ReadinessVote.findOne({ userId: auth.userId, voteDate })
+  ]);
   const ready = votes.filter((vote) => vote.response === "ready").length;
   const notReady = votes.length - ready;
-  const mine = await ReadinessVote.findOne({ userId: auth.userId, voteDate });
   const totalResidents = Math.max(zoneResidentCount, votes.length, 1);
   return NextResponse.json({ data: { voteDate, ready, notReady, total: votes.length, zoneResidentCount, notVoted: Math.max(totalResidents - votes.length, 0), readyPercentage: Math.round((ready / totalResidents) * 100), notReadyPercentage: Math.round((notReady / totalResidents) * 100), votedPercentage: Math.round((votes.length / totalResidents) * 100), isCollectionDay: isCollectionDay(voteDate), myResponse: mine?.response || null } });
 });

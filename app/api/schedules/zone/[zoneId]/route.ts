@@ -8,7 +8,7 @@ import { requireAuth } from "@/server/auth";
 export const GET = handle(async (req: NextRequest, { params }) => {
   await requireAuth(req);
   const { zoneId } = await params;
-  const zone = await Zone.findById(zoneId);
+  const zone = await Zone.findById(zoneId).select("_id");
   if (!zone) throw new ApiError(404, "Zone not found");
   return NextResponse.json({ data: await CollectionSchedule.find({ zoneId: zone.id, isActive: true }).sort({ weekday: 1 }) });
 });
