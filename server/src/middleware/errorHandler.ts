@@ -1,2 +1,0 @@
-import type { ErrorRequestHandler } from "express"; import { ApiError } from "../utils/ApiError";
-export const errorHandler:ErrorRequestHandler=(error,req,res,_next)=>{console.error(error);const status=error instanceof ApiError?error.statusCode:error.name==="ValidationError"?400:error.code===11000?409:500;res.status(status).json({message:error instanceof ApiError?error.message:status===409?"A record with this value already exists":"Internal server error"});};

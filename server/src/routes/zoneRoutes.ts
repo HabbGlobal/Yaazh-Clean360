@@ -1,2 +1,0 @@
-import { Router } from "express"; import { createZone,deleteZone,getZoneMap,listZones,updateZone } from "../controllers/zoneController"; import { authenticate } from "../middleware/authenticate"; import { authorize } from "../middleware/authorize";
-const router=Router(); router.get("/",listZones); router.get("/:id/map",getZoneMap); router.post("/",authenticate,authorize("admin"),createZone); router.patch("/:id",authenticate,authorize("admin"),updateZone); router.delete("/:id",authenticate,authorize("admin"),deleteZone); export default router;

@@ -1,0 +1,31 @@
+import "dotenv/config";
+import mongoose from "mongoose";
+import fs from "node:fs";
+import path from "node:path";
+import { connectDatabase } from "../server/db";
+import { Zone } from "../server/models/Zone";
+
+const defaults = [
+  { zoneNumber: 1, file: "Zone01-RB9593.png", lorry: "RB 9593" },
+  { zoneNumber: 2, file: "Zone02-RE9244.png", lorry: "RE 9244" },
+  { zoneNumber: 3, file: "Zone03-RH9424.png", lorry: "RH 9424" },
+  { zoneNumber: 4, file: "Zone04-RH9425.png", lorry: "RH 9425" },
+  { zoneNumber: 5, file: "Zone05-GL8706.png", lorry: "GL 8706" }
+];
+const imageDirectory = path.resolve(__dirname, "../assets/images");
+const zones = defaults.map((item) => ({
+  zoneNumber: item.zoneNumber,
+  name: `Zone ${item.zoneNumber}`,
+  description: `Waste collection area ${item.zoneNumber}`,
+  imageBase64: `data:image/png;base64,${fs.readFileSync(path.join(imageDirectory, item.file)).toString("base64")}`,
+  assignedLorry: item.lorry,
+  isActive: true
+}));
+
+connectDatabase()
+  .then(async () => {
+    for (const zone of zones) await Zone.findOneAndUpdate({ zoneNumber: zone.zoneNumber }, zone, { upsert: true, new: true, setDefaultsOnInsert: true, runValidators: true });
+    console.log("Five zones with base64 images and lorry assignments seeded");
+    await mongoose.disconnect();
+  })
+  .catch(async (error) => { console.error(error); await mongoose.disconnect(); process.exit(1); });
